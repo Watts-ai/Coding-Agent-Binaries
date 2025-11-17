@@ -52,15 +52,25 @@ jobs:
             echo "Release does not exist: $RELEASE_TAG"
           fi
 
+      - name: Download Gemini CLI
+        if: steps.check-release.outputs.exists == 'false' && matrix.tool.binary == 'gemini'
+        run: |
+          curl -L -o gemini.js "https://github.com/google-gemini/gemini-cli/releases/download/v${{ steps.npm-version.outputs.version }}/gemini.js"
+          echo "Downloaded gemini.js"
+
       - name: Install tool
-        if: steps.check-release.outputs.exists == 'false'
+        if: steps.check-release.outputs.exists == 'false' && matrix.tool.binary != 'gemini'
         run: |
           npm install -g ${{ matrix.tool.package }}@${{ steps.npm-version.outputs.version }}
 
       - name: Build binary
         if: steps.check-release.outputs.exists == 'false'
         run: |
-          BINARY_PATH=$(type -p ${{ matrix.tool.binary }})
+          if [[ "${{ matrix.tool.binary }}" = "gemini" ]]; then
+            BINARY_PATH="gemini.js"
+          else
+            BINARY_PATH=$(type -p ${{ matrix.tool.binary }})
+          fi
           echo "Building from: $BINARY_PATH"
           bun build "$BINARY_PATH" --compile --outfile ${{ matrix.tool.binary }}
 
