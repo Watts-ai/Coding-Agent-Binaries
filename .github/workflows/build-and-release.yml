@@ -1,0 +1,84 @@
+name: Build and Release NPM Tools
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # Every 10 minutes
+  workflow_dispatch: # Allow manual triggers
+
+permissions:
+  contents: write # Required for creating releases
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        tool:
+          - package: "@google/gemini-cli"
+            binary: "gemini"
+          - package: "@anthropic-ai/claude-code"
+            binary: "claude"
+          - package: "@anthropic-ai/sandbox-runtime"
+            binary: "srt"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Get latest NPM version
+        id: npm-version
+        run: |
+          VERSION=$(npm view ${{ matrix.tool.package }} version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Latest NPM version for ${{ matrix.tool.package }}: $VERSION"
+
+      - name: Check if release exists
+        id: check-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE_TAG="${{ matrix.tool.binary }}-${{ steps.npm-version.outputs.version }}"
+          if gh release view "$RELEASE_TAG" &>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Release already exists: $RELEASE_TAG"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Release does not exist: $RELEASE_TAG"
+          fi
+
+      - name: Install tool
+        if: steps.check-release.outputs.exists == 'false'
+        run: |
+          npm install -g ${{ matrix.tool.package }}@${{ steps.npm-version.outputs.version }}
+
+      - name: Build binary
+        if: steps.check-release.outputs.exists == 'false'
+        run: |
+          BINARY_PATH=$(type -p ${{ matrix.tool.binary }})
+          echo "Building from: $BINARY_PATH"
+          bun build "$BINARY_PATH" --compile --outfile ${{ matrix.tool.binary }}
+
+      - name: Verify binary
+        if: steps.check-release.outputs.exists == 'false'
+        run: |
+          ls -lh ${{ matrix.tool.binary }}
+          file ${{ matrix.tool.binary }}
+
+      - name: Create GitHub Release
+        if: steps.check-release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE_TAG="${{ matrix.tool.binary }}-${{ steps.npm-version.outputs.version }}"
+          RELEASE_NAME="${{ matrix.tool.package }} v${{ steps.npm-version.outputs.version }}"
+
+          gh release create "$RELEASE_TAG" \
+            --title "$RELEASE_NAME" \
+            --notes "Binary build of ${{ matrix.tool.package }} version ${{ steps.npm-version.outputs.version }}" \
+            ${{ matrix.tool.binary }}
