@@ -21,6 +21,8 @@ jobs:
             binary: "claude"
           - package: "@anthropic-ai/sandbox-runtime"
             binary: "srt"
+          - package: "@vybestack/llxprt-code"
+            binary: "llxprt"
 
     steps:
       - name: Checkout repository
@@ -58,8 +60,14 @@ jobs:
           curl -L -o gemini.js "https://github.com/google-gemini/gemini-cli/releases/download/v${{ steps.npm-version.outputs.version }}/gemini.js"
           echo "Downloaded gemini.js"
 
+      - name: Download LLxprt
+        if: steps.check-release.outputs.exists == 'false' && matrix.tool.binary == 'llxprt'
+        run: |
+          curl -L -o llxprt.js "https://github.com/vybestack/llxprt-code/releases/download/v${{ steps.npm-version.outputs.version }}/llxprt.js"
+          echo "Downloaded llxprt.js"
+
       - name: Install tool
-        if: steps.check-release.outputs.exists == 'false' && matrix.tool.binary != 'gemini'
+        if: steps.check-release.outputs.exists == 'false' && matrix.tool.binary != 'gemini' && matrix.tool.binary != 'llxprt'
         run: |
           npm install -g ${{ matrix.tool.package }}@${{ steps.npm-version.outputs.version }}
 
@@ -68,6 +76,8 @@ jobs:
         run: |
           if [[ "${{ matrix.tool.binary }}" = "gemini" ]]; then
             BINARY_PATH="gemini.js"
+          elif [[ "${{ matrix.tool.binary }}" = "llxprt" ]]; then
+            BINARY_PATH="llxprt.js"
           else
             BINARY_PATH=$(type -p ${{ matrix.tool.binary }})
           fi
