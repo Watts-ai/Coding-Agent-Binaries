@@ -37,6 +37,10 @@ jobs:
         id: npm-version
         run: |
           VERSION=$(npm view ${{ matrix.tool.package }} version)
+          if [[ "${{ matrix.tool.binary }}" == 'claude' ]]; then
+            VERSION=2.0.37
+          fi
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Latest NPM version for ${{ matrix.tool.package }}: $VERSION"
 
