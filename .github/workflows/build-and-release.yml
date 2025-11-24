@@ -21,6 +21,8 @@ jobs:
             binary: "claude"
           - package: "@anthropic-ai/sandbox-runtime"
             binary: "srt"
+          - package: "@hwittenborn/sandbox-runtime"
+            binary: "hwittenborn-srt"
           - package: "@vybestack/llxprt-code"
             binary: "llxprt"
 
