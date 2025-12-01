@@ -17,26 +17,44 @@ jobs:
         tool:
           - package: "@anthropic-ai/claude-code"
             binary: "claude"
+            type: "js"
           - package: "@anthropic-ai/sandbox-runtime"
             binary: "srt"
+            type: "js"
           - package: "@hwittenborn/sandbox-runtime"
             binary: "hwittenborn-srt"
+            type: "js"
+          - package: "deepagents-cli"
+            binary: "deepagents"
+            type: "python"
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Bun
+        if: matrix.tool.type == 'js'
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - name: Get latest NPM version
+      - name: Set up Python
+        if: matrix.tool.type == 'python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Get latest version
         id: npm-version
         run: |
-          VERSION=$(npm view ${{ matrix.tool.package }} version)
+          if [ "${{ matrix.tool.type }}" == "python" ]; then
+            VERSION=$(curl -s https://pypi.org/pypi/${{ matrix.tool.package }}/json | jq -r .info.version)
+            echo "Latest PyPI version for ${{ matrix.tool.package }}: $VERSION"
+          else
+            VERSION=$(npm view ${{ matrix.tool.package }} version)
+            echo "Latest NPM version for ${{ matrix.tool.package }}: $VERSION"
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Latest NPM version for ${{ matrix.tool.package }}: $VERSION"
 
       - name: Check if release exists
         id: check-release
@@ -55,14 +73,25 @@ jobs:
       - name: Install tool
         if: steps.check-release.outputs.exists == 'false' && matrix.tool.binary != 'gemini' && matrix.tool.binary != 'llxprt'
         run: |
-          npm install -g ${{ matrix.tool.package }}@${{ steps.npm-version.outputs.version }}
+          if [ "${{ matrix.tool.type }}" == "python" ]; then
+            pip install ${{ matrix.tool.package }}==${{ steps.npm-version.outputs.version }}
+          else
+            npm install -g ${{ matrix.tool.package }}@${{ steps.npm-version.outputs.version }}
+          fi
 
       - name: Build binary
         if: steps.check-release.outputs.exists == 'false'
         run: |
           BINARY_PATH=$(type -p ${{ matrix.tool.binary }})
           echo "Building from: $BINARY_PATH"
-          bun build "$BINARY_PATH" --compile --outfile ${{ matrix.tool.binary }}
+
+          if [ "${{ matrix.tool.type }}" == "python" ]; then
+            pip install pyinstaller
+            pyinstaller -F "$BINARY_PATH" --name ${{ matrix.tool.binary }}
+            mv dist/${{ matrix.tool.binary }} .
+          else
+            bun build "$BINARY_PATH" --compile --outfile ${{ matrix.tool.binary }}
+          fi
 
       - name: Verify binary
         if: steps.check-release.outputs.exists == 'false'
