@@ -5,7 +5,7 @@
 
 | Package | Binary | Version | Date | Status | Download |
 |---------|--------|---------|------|--------|----------|
-| @anthropic-ai/claude-code | `claude` | 2.0.55 | 2025-11-27 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/claude-2.0.55/claude) |
+| @anthropic-ai/claude-code | `claude` | 2.0.56 | 2025-12-02 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/claude-2.0.56/claude) |
 | deepagents-cli | `deepagents` | 0.0.10 | 2025-12-01 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/deepagents-0.0.10/deepagents) |
 | @google/gemini-cli | `gemini` | 0.18.4 | 2025-11-26 | ![Deprecated](https://img.shields.io/badge/status-deprecated-red) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/gemini-0.18.4/gemini) |
 | @hwittenborn/sandbox-runtime | `hwittenborn-srt` | 0.0.15 | 2025-11-24 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/hwittenborn-srt-0.0.15/hwittenborn-srt) |
