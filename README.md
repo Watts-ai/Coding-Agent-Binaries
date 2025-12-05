@@ -10,6 +10,6 @@
 | @google/gemini-cli | `gemini` | 0.18.4 | 2025-11-26 | ![Deprecated](https://img.shields.io/badge/status-deprecated-red) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/gemini-0.18.4/gemini) |
 | @hwittenborn/sandbox-runtime | `hwittenborn-srt` | 0.0.18 | 2025-12-04 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/hwittenborn-srt-0.0.18/hwittenborn-srt) |
 | @vybestack/llxprt-code | `llxprt` | 0.6.2 | 2025-11-30 | ![Deprecated](https://img.shields.io/badge/status-deprecated-red) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/llxprt-0.6.2/llxprt) |
-| @anthropic-ai/sandbox-runtime | `srt` | 0.0.18 | 2025-12-03 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/srt-0.0.18/srt) |
+| @anthropic-ai/sandbox-runtime | `srt` | 0.0.19 | 2025-12-05 | ![Active](https://img.shields.io/badge/status-active-brightgreen) | [Download](https://github.com/Watts-ai/Coding-Agent-Binaries/releases/download/srt-0.0.19/srt) |
 
 <!-- STATUS_TABLE_END -->
